@@ -1,5 +1,6 @@
 #include <KNoTThing.h>
 #include <EmonLib.h>
+#include <IRremote.h>
 
 const int LIGHT_BULB_PINS[4] = {8, 9, 10, 11};
 #define LIGHT_BULB_ID       1
@@ -11,6 +12,10 @@ EnergyMonitor emon1;
 #define POWER_ID       2
 #define POWER_NAME     "Power sensor"
 int voltage = 220;
+
+IRsend irsend;
+unsigned int irOn[] = {9000, 4500, 560, 560, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 560, 560, 560, 560, 560, 560, 1690, 560, 1690, 560, 560, 560, 1690, 560, 1690, 560, 1690, 560, 1690, 560, 1690, 560, 560, 560, 560, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 560, 560, 560, 560, 1690, 560, 1690, 560, 1690, 560, 560, 560, 1690, 560, 1690, 560, 1690, 560, 1690, 560, 39416, 9000, 2210, 560}; //AnalysIR Batch Export (IRremote) - RAW
+unsigned int irOff[] = {9000, 4500, 560, 560, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 560, 560, 560, 560, 560, 560, 1690, 560, 1690, 560, 560, 560, 1690, 560, 1690, 560, 1690, 560, 1690, 560, 1690, 560, 560, 560, 560, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 560, 560, 560, 560, 1690, 560, 1690, 560, 1690, 560, 560, 560, 1690, 560, 1690, 560, 1690, 560, 1690, 560, 39416, 9000, 2210, 560}; //AnalysIR Batch Export (IRremote) - RAW
 
 KNoTThing thing;
 
@@ -29,6 +34,13 @@ static int light_write(uint8_t *val)
 {
     for(int i = 0; i < sizeof(LIGHT_BULB_PINS)/sizeof(int); i++) {
       digitalWrite(LIGHT_BULB_PINS[i], *val);
+    }
+
+    if(*val == HIGH) {
+      irsend.sendRaw(irOn, sizeof(irOn) / sizeof(irOn[0]), 32);
+    }
+    else {
+      irsend.sendRaw(irOff, sizeof(irOff) / sizeof(irOff[0]), 32);
     }
     
     Serial.print(F("Light Status: "));
